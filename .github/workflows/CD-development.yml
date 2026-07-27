@@ -1,4 +1,4 @@
-name: CD
+name: CD-development
 
 on:
   workflow_run:
@@ -11,6 +11,7 @@ jobs:
   deploy:
     if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+    environment: development
 
     steps:
       - name: Checkout Kubernetes manifests
@@ -43,7 +44,7 @@ jobs:
 
       - name: Wait for rollout
         run: |
-          kubectl rollou status deployment/myapp -n development
+          kubectl rollout status deployment/myapp -n development
 
       - name: Run smoke tests
         run: |
