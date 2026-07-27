@@ -1,17 +1,18 @@
 
-name: pipeline
+name: CI
 
 on:
-  push:
-    branches: [ "development" ]
   pull_request:
-    branches: [ "development" ]
+    branches: [ 'development' ]
+  pull_request_review:
+    types: submitted
 
   workflow_dispatch:
 
 jobs:
   
   build-and-test:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
     steps:
@@ -35,10 +36,24 @@ jobs:
         id: sonarqube-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@master
         
-  docker:
+  build-image-and-integration-tests:
+    if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved'
     runs-on: ubuntu-latest
     
+    services:
+
+      postgres:
+        image: mysql:integration-tests
+        env:
+          MYSQL_USER: test
+          MYSQL_PASSWORD: password
+          MYSQL_DB: mydb
+        ports:
+          - 3306:3306
+    
     steps:
+      - uses: actions/checkout@v6
+      
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
         
@@ -50,13 +65,12 @@ jobs:
         with:
           registry: ghcr.io
   
-      - name: Build and push
-        uses: docker/build-push-action@v2
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Dockerfile
-          push: true
-          tags: myimage:latest
+          load: true
+          tags: myapp:test
   
       
         
