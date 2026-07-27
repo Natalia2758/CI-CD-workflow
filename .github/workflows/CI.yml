@@ -4,15 +4,12 @@ name: CI
 on:
   pull_request:
     branches: [ 'development' ]
-  pull_request_review:
-    types: submitted
 
   workflow_dispatch:
 
 jobs:
   
   build-and-test:
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
     steps:
@@ -35,15 +32,14 @@ jobs:
       - name: SonarQube Quality Gate check
         id: sonarqube-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@master
-        
-  build-image-and-integration-tests:
-    if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved'
+
+  build-container-and-integration-tests:        
+    needs: build-and-test
     runs-on: ubuntu-latest
     
     services:
-
-      postgres:
-        image: mysql:integration-tests
+      mysql:
+        image: mysql:test
         env:
           MYSQL_USER: test
           MYSQL_PASSWORD: password
@@ -52,7 +48,8 @@ jobs:
           - 3306:3306
     
     steps:
-      - uses: actions/checkout@v6
+      - name: checkout repository
+        uses: actions/checkout@v6
       
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -64,20 +61,32 @@ jobs:
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
   
-      - name: Build Docker image
+      - name: Build image
         uses: docker/build-push-action@v6
         with:
           context: .
           load: true
-          tags: myapp:test
-  
+          tags: |
+              ghcr.io/${{ github.repository_owner }}/myapp:${{ github.sha }}-pr
+
+      - name: Run application container
+        run: |
+          docker run -d --name myapp -p 8080:8080 ghcr.io/${{ github.repository_owner }}/myapp:${{ github.sha }}-pr
+
+      - name: Run integration tests
+        run: |
+          mvn verify
+
+      - name: Push tested image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/myapp:${{ github.sha }}-pr
       
         
-        
-
-      - Docker build
-
-      - Docker image scan
-
-      - Push image to registry
+      
