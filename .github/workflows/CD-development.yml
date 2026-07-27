@@ -8,7 +8,48 @@ on:
       - completed
 
 jobs:
-  
+  deploy:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Kubernetes manifests
+        uses: actions/checkout@v6
+        with:
+          repository: my-company/kubernetes-manifests
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Authenticate AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Configure kubectl
+        run: |
+          aws eks update-kubeconfig --name my-cluster
+
+      - name: Deploy to development environment
+        run: |
+          kubectl set image deployment/myapp myapp=ghcr.io/${{ github.repository_owner }}/myapp:${{ github.event.workflow_run.head_sha }} -n development
+
+      - name: Wait for rollout
+        run: |
+          kubectl rollou status deployment/myapp -n development
+
+      - name: Run smoke tests
+        run: |
+          ...
+          
+          
 
   
 
