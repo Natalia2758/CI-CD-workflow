@@ -46,8 +46,20 @@ jobs:
       - name: Wait for rollout
         run: |
           kubectl rollout status deployment/myapp -n staging
-
-      - name: Run tests
+  e2e-tests:
+      runs-on: ubuntu-latest
+      environment:
+        name: staging
+      needs: deploy
+      
+      steps:
+      - name: Run end-to-end tests
         run: |
           ...
-          
+        # test reports
+
+      - name: Run load tests
+        run:
+
+      
+        # test reports
