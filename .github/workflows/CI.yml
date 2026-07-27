@@ -50,7 +50,8 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v6
-        
+
+        # Setting up Buildx action is not necessary, but recommended by the Docker's official GitHub Action
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
           
