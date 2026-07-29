@@ -41,7 +41,7 @@ jobs:
 
       - name: Run smoke tests
         run: |
-          ...
+          mvn test -Dtest=*SmokeTest
           
           
 
