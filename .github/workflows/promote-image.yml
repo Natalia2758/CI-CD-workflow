@@ -1,4 +1,4 @@
-name: Promote Docker Image
+name: Promote Image
 
 on: 
   pull_request_review:
