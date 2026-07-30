@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout Kubernetes manifests
-        uses: actions/checkout@v6
+        uses: actions/checkout@vv7.0.1
         with:
           repository: abc-company/kubernetes-manifests
 
@@ -53,10 +53,20 @@ jobs:
       needs: deploy
       
       steps:
-      - name: Run smoke tests
-        run: |
-          mvn test -Dtest=*SmokeTest
-  
+        - name: Checkout
+          uses: actions/checkout@v7.0.1
+
+        - name: Set Up JDK
+          uses: actions/setup-java@v5.5.0
+          with:
+            distribution: oracle
+            java-version: 21
+            cache: maven
+            
+        - name: Run smoke tests
+          run: |
+            mvn test -Dtest=*SmokeTest
+    
   e2e-tests:
       runs-on: ubuntu-latest
       environment:
@@ -64,23 +74,34 @@ jobs:
       needs: smoke-tests
       
       steps:
-      - name: Run end-to-end tests
-        run: |
-          mvn test -Dtest=*E2ETest
-        # test reports
+        - name: Checkout
+          uses: actions/checkout@v7.0.1
+
+        - name: Set Up JDK
+          uses: actions/setup-java@v5.5.0
+          with:
+            distribution: oracle
+            java-version: 21
+            cache: maven
+        
+        - name: Run end-to-end tests
+          run: |
+            mvn test -Dtest=*E2ETest
+            # test reports
+            
   load-tests:
-      runs-on: ubuntu-latest
-      environment:
-        name: staging
-      needs: e2e-tests
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+    needs: e2e-tests
       
-      steps:
+    steps:
       - name: Run load tests
         run:
 
   rollback:
-    needs: [deploy, smoke-tests]
-    if: always() && (needs.deploy.result == 'failure' || needs.smoke-tests.result == 'failure')
+    needs: [deploy, smoke-tests, e2e-tests, load-tests]
+    if: always() && (needs.deploy.result == 'failure' || needs.smoke-tests.result == 'failure' || needs.e2e-tests.result == 'failure' || needs.load-tests.result == 'failure')
     runs-on: ubuntu-latest
     environment:
       name: staging
@@ -107,4 +128,4 @@ jobs:
 
       - name: Notify about the rollback
         run: |
-          echo "Deployment was rolled back - deployment or smoke tests failure"
+          echo "Deployment was rolled back - deployment or tests failure"
