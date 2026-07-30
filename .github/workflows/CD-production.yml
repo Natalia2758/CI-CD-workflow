@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Checkout Kubernetes manifests
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7.0.1
         with:
           repository: abc-company/kubernetes-manifests
 
@@ -51,6 +51,16 @@ jobs:
     needs: deploy
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Set Up JDK
+        uses: actions/setup-java@v5.5.0
+        with:
+          distribution: oracle
+          java-version: 21
+          cache: maven
+          
       - name: Run smoke tests
         run: |
           mvn test -Dtest=*SmokeTest
