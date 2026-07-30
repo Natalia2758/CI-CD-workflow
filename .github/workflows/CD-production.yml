@@ -60,7 +60,7 @@ jobs:
     if: always() && (needs.deploy.result == 'failure' || needs.smoke-tests.result == 'failure')
     runs-on: ubuntu-latest
     environment:
-      name: staging
+      name: production
 
     steps:
       - name: Authenticate AWS
