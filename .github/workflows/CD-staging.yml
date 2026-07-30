@@ -78,5 +78,33 @@ jobs:
       - name: Run load tests
         run:
 
-      
-        # test reports
+  rollback:
+    needs: [deploy, smoke-tests]
+    if: always() && (needs.deploy.result == 'failure' || needs.smoke-tests.result == 'failure')
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+
+    steps:
+      - name: Authenticate AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+          
+      - name: Configure kubectl
+        run: |
+          aws eks update-kubeconfig --name web-app-cluster
+
+      - name: Roll back deployment
+        run: |
+          kubectl rollout undo deployment/web_app --namespace staging
+
+      - name: Wait for rollback
+        run: |
+          kubectl rollout status deployment/web_app --namespace staging --timeout=120s
+
+      - name: Notify about the rollback
+        run: |
+          echo "Deployment was rolled back - deployment or smoke tests failure"
