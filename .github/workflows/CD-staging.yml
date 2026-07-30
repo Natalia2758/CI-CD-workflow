@@ -97,7 +97,13 @@ jobs:
       
     steps:
       - name: Run load tests
-        run:
+        id: enterprise-action
+        uses: gatling/enterprise-action@v1.1.1
+        with:
+          api_token: ${{ secrets.GATLING_ENTERPRISE_API_TOKEN }}
+          simulation_id: ${{ secrets.SIMULATION_ID }}
+      - run: |
+          echo "Gatling report URL: ${{ steps.enterprise-action.outputs.reports_url }}"
 
   rollback:
     needs: [deploy, smoke-tests, e2e-tests, load-tests]
