@@ -67,11 +67,11 @@ jobs:
           context: .
           load: true
           tags: |
-              ghcr.io/${{ github.repository_owner }}/myapp:${{ github.sha }}-pr
+              ghcr.io/${{ github.repository_owner }}/web_app:${{ github.sha }}-pr
 
       - name: Run application container
         run: |
-          docker run -d --name myapp -p 8080:8080 ghcr.io/${{ github.repository_owner }}/myapp:${{ github.sha }}-pr
+          docker run -d --name web_app -p 8080:8080 ghcr.io/${{ github.repository_owner }}/web_app:${{ github.sha }}-pr
 
       - name: Run integration tests
         run: |
@@ -83,7 +83,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/myapp:${{ github.sha }}-pr
+            ghcr.io/${{ github.repository_owner }}/web_app:${{ github.sha }}-pr
 
       - name: Upload test reports
         uses: actions/upload-artifact@v4
