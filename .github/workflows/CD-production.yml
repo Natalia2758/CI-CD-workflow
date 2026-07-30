@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: 
       name: production
+      # Production environment is configure with review required, therefore this job only runs after receiving approval
 
     steps:
       - name: Checkout Kubernetes manifests
