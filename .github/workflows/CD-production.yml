@@ -47,10 +47,12 @@ jobs:
       - name: Wait for rollout
         run: |
           kubectl rollout status deployment/myapp -n production
-
+  smoke-tests:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
       - name: Run smoke tests
         run: |
           ...
           
-      - name: Monitoring
           
