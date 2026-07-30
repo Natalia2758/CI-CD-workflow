@@ -3,7 +3,7 @@ name: CD-production
 on:
   workflow_run:
     workflows:
-      - Promote Image
+      - CD-staging
     types:
       - completed
 
