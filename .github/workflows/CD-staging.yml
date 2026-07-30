@@ -46,18 +46,34 @@ jobs:
       - name: Wait for rollout
         run: |
           kubectl rollout status deployment/myapp -n staging
-  e2e-tests:
+  smoke-tests:
       runs-on: ubuntu-latest
       environment:
         name: staging
       needs: deploy
       
       steps:
+      - name: Run smoke tests
+        run: |
+          mvn test -Dtest=*SmokeTest
+  
+  e2e-tests:
+      runs-on: ubuntu-latest
+      environment:
+        name: staging
+      needs: smoke-tests
+      
+      steps:
       - name: Run end-to-end tests
         run: |
           mvn test -Dtest=*E2ETest
         # test reports
-
+  load-tests:
+      runs-on: ubuntu-latest
+      environment:
+        name: staging
+      needs: e2e-tests
+      steps:
       - name: Run load tests
         run:
 
