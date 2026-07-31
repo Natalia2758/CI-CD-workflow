@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7.0.1
         with:
-          repository: 'web-app-repo"
+          repository: 'web-app-repo'
 
       - name: Set Up JDK
         uses: actions/setup-java@v5.5.0
