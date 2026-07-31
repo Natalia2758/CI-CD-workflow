@@ -124,6 +124,9 @@ jobs:
         run: |
           kubectl rollout status deployment/web_app --namespace staging --timeout=120s
 
-      - name: Notify about the rollback
+      - name: Inform about the execution
         run: |
-          echo "Deployment was rolled back - deployment or tests failure"
+          echo "Deploy: ${{ needs.deploy.result }}"
+          echo "Smoke: ${{ needs.smoke-tests.result }}"
+          echo "E2E: ${{ needs.e2e-tests.result }}"
+          echo "Load: ${{ needs.load-tests.result }}"
