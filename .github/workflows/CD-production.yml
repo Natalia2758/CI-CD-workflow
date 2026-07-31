@@ -91,7 +91,34 @@ jobs:
       - name: Wait for rollback
         run: |
           kubectl rollout status deployment/web_app --namespace production --timeout=120s
+  
 
       - name: Notify about the rollback
         run: |
           echo "Deployment was rolled back - deployment or smoke tests failure"   
+
+
+  merge-to-production:
+    needs: [deploy, smoke-tests]
+    if: success()
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
+      # needed for merging
+      - name: Configure Git
+        run: |
+          git config user.name "CD-production: automatic merge into production"
+          git config user.email "github-actions-bot@noreply.github.com"
+
+      - name: Merge development branch into production
+        run: |
+          git fetch origin
+          git checkout production
+          git merge origin/development -message "Release ${{ github.event.workflow_run.head_sha }}"
+          git push origin production
