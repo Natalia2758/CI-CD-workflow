@@ -86,9 +86,9 @@ jobs:
           kubectl rollout status deployment/web_app --namespace production --timeout=120s
   
 
-      - name: Notify about the rollback
+      - name: Inform about the test results
         run: |
-          echo "Deployment was rolled back - deployment or smoke tests failure"   
+          echo "Smoke: ${{ needs.smoke-tests.result }}"  
 
 
   merge-to-production:
