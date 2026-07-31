@@ -33,5 +33,11 @@ jobs:
       - name: Push approved image
         run: |
           docker push ghcr.io/${{ github.repository_owner }}/web_app:${{ github.event.pull_request.head.sha }}
-    
+
+      - name: Merge PR into development branch
+        run: |
+          gh pr merge ${{ github.event.pull_request.number }} --merge --delete-branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
     
