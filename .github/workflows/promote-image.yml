@@ -7,7 +7,7 @@ on:
 
 jobs:
   promote-image:
-    if: github.event.review.state == 'approved'
+    if: github.event.review.state == 'approved' && github.event.pull_request.base.ref == 'development'
     runs-on: ubuntu-latest
     
     steps:
