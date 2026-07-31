@@ -96,6 +96,16 @@ jobs:
           name: test-reports
           path: |
           # Paths where analysis and testing results are stored
+  request-review:
+      needs: build-container-and-integration-tests
+      runs-on: ubuntu-latest
+      
+      steps:
+        - name: Request review
+          env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          run: |
+            gh pr edit ${{ github.event.pull_request.number }} --add-reviewer senior-dev
       
         
       
