@@ -21,13 +21,6 @@ jobs:
         with:
           repository: abc-company/kubernetes-manifests
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Authenticate AWS
         uses: aws-actions/configure-aws-credentials@v4
         
@@ -42,11 +35,11 @@ jobs:
 
       - name: Deploy to production environment
         run: |
-          kubectl set image deployment/web_app web_app=ghcr.io/${{ github.repository_owner }}/web_app:${{ github.event.workflow_run.head_sha }} -n production
+          kubectl set image deployment/web_app web_app=ghcr.io/${{ github.repository_owner }}/web_app:${{ github.event.workflow_run.head_sha }} --namespace production
 
       - name: Wait for rollout
         run: |
-          kubectl rollout status deployment/web_app -n production
+          kubectl rollout status deployment/web_app --namespace production --timeout=120s
   smoke-tests:
     needs: deploy
     runs-on: ubuntu-latest
