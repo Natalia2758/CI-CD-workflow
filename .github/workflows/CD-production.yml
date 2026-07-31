@@ -67,7 +67,7 @@ jobs:
           
   rollback:
     needs: [deploy, smoke-tests]
-    if: always() && (needs.deploy.result == 'failure' || needs.smoke-tests.result == 'failure')
+    if: always() && needs.smoke-tests.result == 'failure'
     runs-on: ubuntu-latest
     environment:
       name: production
