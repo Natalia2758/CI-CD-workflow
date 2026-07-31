@@ -107,7 +107,7 @@ jobs:
 
   rollback:
     needs: [deploy, smoke-tests, e2e-tests, load-tests]
-    if: always() && (needs.deploy.result == 'failure' || needs.smoke-tests.result == 'failure' || needs.e2e-tests.result == 'failure' || needs.load-tests.result == 'failure')
+    if: always() && (needs.smoke-tests.result == 'failure' || needs.e2e-tests.result == 'failure' || needs.load-tests.result == 'failure')
     runs-on: ubuntu-latest
     environment:
       name: staging
