@@ -5,6 +5,10 @@ on:
     types:
       - submitted
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   promote-image:
     if: github.event.review.state == 'approved' && github.event.pull_request.base.ref == 'development'
