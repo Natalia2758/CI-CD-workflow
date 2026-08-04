@@ -21,7 +21,7 @@ jobs:
       - name: Checkout Kubernetes manifests
         uses: actions/checkout@vv7.0.1
         with:
-          repository: infrastructure/kubernetes-manifests
+          repository: infrastructure-repo/kubernetes-manifests
 
       - name: Authenticate AWS
         uses: aws-actions/configure-aws-credentials@v4
