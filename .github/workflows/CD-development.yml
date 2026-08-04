@@ -24,7 +24,7 @@ jobs:
           repository: abc-company/kubernetes-manifests
 
       - name: Authenticate AWS
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: infrastructure/configure-aws-credentials@v4
         
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
